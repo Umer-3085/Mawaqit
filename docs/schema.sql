@@ -71,3 +71,10 @@ create table translation_tafseer (
     constraint foreign_verse_no foreign key ( verse_no ) references verse ( verse_number ) on delete cascade on update cascade,
     constraint foreign_tafseer_id foreign key ( tafseer_id ) references tafseer_detail ( id ) on delete cascade on update cascade
 );    
+
+show tables
+drop tables admin,article_videos,
+drop tables translation_tafseer
+drop tables tafseer_detail
+drop tables verse
+drop tables surah,subcategory,category
