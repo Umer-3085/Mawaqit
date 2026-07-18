@@ -88,4 +88,4 @@ create table verse_texts (
     constraint verse_texts_identifier foreign key (detail_id) references translation_tafseer_details (id) on delete cascade on update cascade
 );
 
-show tables
+show tables;
