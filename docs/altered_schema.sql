@@ -10,6 +10,7 @@ create table admin (
 create table category (
 	id bigint unsigned not null auto_increment,
     title varchar(255) not null,
+    description text,
     primary key category_id (id),
     unique key category_title (title)
 );
@@ -18,6 +19,7 @@ create table subcategory (
 	id bigint unsigned not null auto_increment,
     title varchar(255) not null,
     category_id bigint unsigned not null,
+    description text,
     primary key subcategory_id (id),
     unique key subcategory_title (title),
     constraint foreign_category_id foreign key ( category_id ) references category ( id ) On delete cascade on update cascade
@@ -47,7 +49,6 @@ create table surah (
 );
 
 create table verse (
-	id bigint unsigned not null auto_increment,
 	number_in_surah int unsigned not null,
     arabic text,
     surah_number tinyint unsigned not null,
@@ -58,34 +59,37 @@ create table verse (
     ruku smallint unsigned,
     hizb_quarter tinyint unsigned,
     sajda boolean default false,
-    primary key verse_identifier (id),
+    primary key verse_identifier (surah_number,number_in_surah),
     constraint foreign_surah_no foreign key ( surah_number ) references surah ( surah_number ) on delete cascade on update cascade
 );
 
-CREATE TABLE translation_tafseer_details (
+create table translation_tafseer_details (
     id bigint unsigned not null auto_increment,
-    identifier varchar(50) not null,
-    english_name varchar(255),
+    title varchar(255) not null,
     lang char(2) not null,     
-    type_ Enum('translation','tafsir') not null,             
     author varchar(100) not null,
     direction Enum('ltr','rtl'),
-    edition_name varchar(255) not null,
     description text,
     primary key tafseer_detail_id (id),
-    unique key edition_identifier ( identifier ) 
+    unique key translation_tafseer_title ( title ) 
 );
 
 create table verse_texts (
-    id bigint unsigned not null auto_increment,
-    verse_id bigint unsigned not null,
+	surah_number tinyint unsigned not null,
+    verse_number int unsigned not null,
     detail_id bigint unsigned not null,
-    text_type Enum('translation','tafsir') not null,
-    text_content longtext not null,
-    primary key verse_text_id (id),
-    unique key verse_detail_type (verse_id, detail_id, text_type),
-    constraint verse_identifier foreign key (verse_id) references verse (id) on delete cascade on update cascade,
+    verse_translation longtext not null,
+    verse_tafseer longtext,
+    primary key verse_text_id (surah_number,verse_number),
+    constraint foreign_surah_and_verse_no_for_text foreign key ( surah_number,verse_number ) references verse ( surah_number,number_in_surah ) on delete cascade on update cascade,
     constraint verse_texts_identifier foreign key (detail_id) references translation_tafseer_details (id) on delete cascade on update cascade
 );
 
-show tables;
+show tables
+drop table verse_texts;
+drop table verse;
+drop table surah;
+drop table translation_tafseer_details;
+drop table article_videos;
+drop table admin,subcategory;
+drop table category;
