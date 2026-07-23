@@ -5,7 +5,7 @@ from sqlalchemy.orm import sessionmaker
 from mawaqit.config import settings
 from mawaqit.models.admin import Admin
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 async def create_admin(username: str, password: str):
     engine = create_async_engine(settings.database_url)

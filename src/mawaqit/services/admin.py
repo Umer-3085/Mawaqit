@@ -4,7 +4,7 @@ from datetime import datetime, timedelta
 from mawaqit.config import settings
 from mawaqit.repositories.admin import AdminRepository
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 class AdminService:
     def __init__(self, repo: AdminRepository):
