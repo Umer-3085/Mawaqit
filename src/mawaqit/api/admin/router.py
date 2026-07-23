@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Form
 from mawaqit.schemas.admin import AdminLogin, AdminUpdate, Token
 from mawaqit.services.admin import AdminService
 from mawaqit.api.deps import get_admin_service, get_current_admin
@@ -7,9 +7,13 @@ from mawaqit.models.admin import Admin
 router = APIRouter(prefix="/admin", tags=["admin"])
 
 @router.post("/login", response_model=Token)
-async def login(creds: AdminLogin, service: AdminService = Depends(get_admin_service)):
-    admin = await service.repo.get_by_username(creds.username)
-    if not admin or not service.verify_password(creds.password, admin.password_hash):
+async def login(
+    username: str = Form(...),
+    password: str = Form(...),
+    service: AdminService = Depends(get_admin_service)
+):
+    admin = await service.repo.get_by_username(username)
+    if not admin or not service.verify_password(password, admin.password_hash):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Invalid credentials",

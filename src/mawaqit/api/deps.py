@@ -1,5 +1,5 @@
 from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
+from fastapi.security import HTTPBearer
 from sqlalchemy.ext.asyncio import AsyncSession
 from jose import jwt, JWTError
 from mawaqit.database import get_db
@@ -15,13 +15,19 @@ from mawaqit.repositories.subcategory import SubCategoryRepository
 from mawaqit.services.subcategory import SubCategoryService
 from mawaqit.repositories.category import CategoryRepository
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/admin/login")
+from mawaqit.repositories.article_videos import ArticleVideoRepository
+from mawaqit.services.article_videos import ArticleVideoService
+from mawaqit.repositories.category import CategoryRepository
+from mawaqit.repositories.subcategory import SubCategoryRepository
+
+
+oauth2_scheme = HTTPBearer(auto_error=False)
 
 async def get_admin_service(db: AsyncSession = Depends(get_db)) -> AdminService:
     return AdminService(AdminRepository(db))
 
 async def get_current_admin(
-    token: str = Depends(oauth2_scheme),
+    credentials = Depends(oauth2_scheme),
     service: AdminService = Depends(get_admin_service)
 ) -> Admin:
     credentials_exception = HTTPException(
@@ -29,6 +35,7 @@ async def get_current_admin(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    token = credentials.credentials
     try:
         payload = jwt.decode(token, settings.secret_key, algorithms=[settings.algorithm])
         username: str = payload.get("sub")
@@ -47,3 +54,10 @@ async def get_category_service(db: AsyncSession = Depends(get_db)) -> CategorySe
 
 async def get_subcategory_service(db: AsyncSession = Depends(get_db)) -> SubCategoryService:
     return SubCategoryService(SubCategoryRepository(db), CategoryRepository(db))
+
+async def get_article_video_service(db: AsyncSession = Depends(get_db)) -> ArticleVideoService:
+    return ArticleVideoService(
+        ArticleVideoRepository(db),
+        CategoryRepository(db),
+        SubCategoryRepository(db)
+    )
