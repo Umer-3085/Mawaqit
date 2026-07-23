@@ -15,6 +15,11 @@ from mawaqit.repositories.subcategory import SubCategoryRepository
 from mawaqit.services.subcategory import SubCategoryService
 from mawaqit.repositories.category import CategoryRepository
 
+from mawaqit.repositories.article_videos import ArticleVideoRepository
+from mawaqit.services.article_videos import ArticleVideoService
+from mawaqit.repositories.category import CategoryRepository
+from mawaqit.repositories.subcategory import SubCategoryRepository
+
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/admin/login")
 
 async def get_admin_service(db: AsyncSession = Depends(get_db)) -> AdminService:
@@ -47,3 +52,10 @@ async def get_category_service(db: AsyncSession = Depends(get_db)) -> CategorySe
 
 async def get_subcategory_service(db: AsyncSession = Depends(get_db)) -> SubCategoryService:
     return SubCategoryService(SubCategoryRepository(db), CategoryRepository(db))
+
+async def get_article_video_service(db: AsyncSession = Depends(get_db)) -> ArticleVideoService:
+    return ArticleVideoService(
+        ArticleVideoRepository(db),
+        CategoryRepository(db),
+        SubCategoryRepository(db)
+    )
