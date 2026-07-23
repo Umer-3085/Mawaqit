@@ -7,6 +7,8 @@ from mawaqit.config import settings
 from mawaqit.repositories.admin import AdminRepository
 from mawaqit.services.admin import AdminService
 from mawaqit.models.admin import Admin
+from mawaqit.repositories.category import CategoryRepository
+from mawaqit.services.category import CategoryService
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/admin/login")
 
@@ -34,3 +36,6 @@ async def get_current_admin(
     if admin is None:
         raise credentials_exception
     return admin
+
+async def get_category_service(db: AsyncSession = Depends(get_db)) -> CategoryService:
+    return CategoryService(CategoryRepository(db))
