@@ -85,11 +85,4 @@ create table verse_texts (
     constraint verse_texts_identifier foreign key (detail_id) references translation_tafseer_details (id) on delete cascade on update cascade
 );
 
-show tables
-drop table verse_texts;
-drop table verse;
-drop table surah;
-drop table translation_tafseer_details;
-drop table article_videos;
-drop table admin,subcategory;
-drop table category;
+select * from verse
