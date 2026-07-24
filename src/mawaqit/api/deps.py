@@ -23,6 +23,9 @@ from mawaqit.repositories.subcategory import SubCategoryRepository
 from mawaqit.repositories.surah import SurahRepository
 from mawaqit.services.surah import SurahService
 
+from mawaqit.repositories.verse import VerseRepository
+from mawaqit.services.verse import VerseService
+
 oauth2_scheme = HTTPBearer(auto_error=False)
 
 async def get_admin_service(db: AsyncSession = Depends(get_db)) -> AdminService:
@@ -66,3 +69,6 @@ async def get_article_video_service(db: AsyncSession = Depends(get_db)) -> Artic
 
 async def get_surah_service(db: AsyncSession = Depends(get_db)) -> SurahService:
     return SurahService(SurahRepository(db))
+
+async def get_verse_service(db: AsyncSession = Depends(get_db)) -> VerseService:
+    return VerseService(VerseRepository(db), SurahRepository(db))
