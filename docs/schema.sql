@@ -85,4 +85,7 @@ create table verse_texts (
     constraint verse_texts_identifier foreign key (detail_id) references translation_tafseer_details (id) on delete cascade on update cascade
 );
 
-select * from verse
+select * from surah;
+
+alter table surah change column relevation_type revelation_type 
+    enum('Meccan','Medinan') not null;
