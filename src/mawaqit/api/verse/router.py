@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Path
 from mawaqit.schemas.verse import VerseResponse, VerseList
 from mawaqit.services.verse import VerseService
 from mawaqit.api.deps import get_verse_service
@@ -30,20 +30,20 @@ async def get_verse_by_global(global_number: int, service: VerseService = Depend
     return await service.get_by_global_number(global_number)
 
 @router.get("/surah/{surah_number}", response_model=list[VerseResponse])
-async def get_verses_by_surah(surah_number: int, service: VerseService = Depends(get_verse_service)):
+async def get_verses_by_surah(surah_number: int = Path(..., ge=1, le=114), service: VerseService = Depends(get_verse_service)):
     return await service.get_by_surah(surah_number)
 
 @router.get("/surah/{surah_number}/{number_in_surah}", response_model=VerseResponse)
-async def get_verse(surah_number: int, number_in_surah: int, service: VerseService = Depends(get_verse_service)):
+async def get_verse(surah_number: int = Path(..., ge=1, le=114), number_in_surah: int = Path(..., ge=1), service: VerseService = Depends(get_verse_service)):
     return await service.get_by_composite_key(surah_number, number_in_surah)
 
 @router.get("/by-juz/{juz}", response_model=list[VerseResponse])
-async def get_verses_by_juz(juz: int = Query(..., ge=1, le=30), service: VerseService = Depends(get_verse_service)):
+async def get_verses_by_juz(juz: int = Path(..., ge=1, le=30), service: VerseService = Depends(get_verse_service)):
     items, _ = await service.repo.get_all(page=1, page_size=6000, juz=juz)  # ~6000 verses max
     return items
 
 @router.get("/by-page/{page_no}", response_model=list[VerseResponse])
-async def get_verses_by_page(page_no: int, service: VerseService = Depends(get_verse_service)):
+async def get_verses_by_page(page_no: int = Path(..., ge=1), service: VerseService = Depends(get_verse_service)):
     items, _ = await service.repo.get_all(page=1, page_size=6000, page_no=page_no)
     return items
 
