@@ -26,6 +26,9 @@ from mawaqit.services.surah import SurahService
 from mawaqit.repositories.verse import VerseRepository
 from mawaqit.services.verse import VerseService
 
+from mawaqit.repositories.translation_tafseer_details import TranslationTafseerDetailRepository
+from mawaqit.services.translation_tafseer_details import TranslationTafseerDetailService
+
 oauth2_scheme = HTTPBearer(auto_error=False)
 
 async def get_admin_service(db: AsyncSession = Depends(get_db)) -> AdminService:
@@ -72,3 +75,6 @@ async def get_surah_service(db: AsyncSession = Depends(get_db)) -> SurahService:
 
 async def get_verse_service(db: AsyncSession = Depends(get_db)) -> VerseService:
     return VerseService(VerseRepository(db), SurahRepository(db))
+
+async def get_translation_tafseer_details_service(db: AsyncSession = Depends(get_db)) -> TranslationTafseerDetailService:
+    return TranslationTafseerDetailService(TranslationTafseerDetailRepository(db))
