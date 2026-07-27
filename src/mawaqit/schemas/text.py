@@ -1,6 +1,5 @@
-from pydantic import BaseModel, Field
+from pydantic import BaseModel
 from typing import Optional
-from mawaqit.schemas.detail import TranslationTafseerDetailResponse
 
 class VerseTextResponse(BaseModel):
     surah_number: int
@@ -8,7 +7,6 @@ class VerseTextResponse(BaseModel):
     detail_id: int
     verse_translation: str
     verse_tafseer: Optional[str] = None
-    translation_detail: Optional[TranslationTafseerDetailResponse] = None
     class Config:
         from_attributes = True
 

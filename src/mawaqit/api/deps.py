@@ -31,9 +31,6 @@ from mawaqit.services.detail import TranslationTafseerDetailService
 
 from mawaqit.repositories.text import VerseTextRepository
 from mawaqit.services.text import VerseTextService
-from mawaqit.repositories.surah import SurahRepository
-from mawaqit.repositories.verse import VerseRepository
-from mawaqit.repositories.detail import TranslationTafseerDetailRepository
 
 oauth2_scheme = HTTPBearer(auto_error=False)
 

@@ -2,7 +2,6 @@ from sqlalchemy import select, func, or_, join
 from sqlalchemy.ext.asyncio import AsyncSession
 from mawaqit.models.text import VerseText
 from mawaqit.models.detail import TranslationTafseerDetail
-from typing import Optional
 
 class VerseTextRepository:
     def __init__(self, db: AsyncSession):
@@ -75,8 +74,7 @@ class VerseTextRepository:
         return await self.get_all(page=page, page_size=page_size, detail_id=detail_id)
 
     async def get_by_lang(self, lang: str, page: int = 1, page_size: int = 20) -> tuple[list[VerseText], int]:
-        # Join with translation_tafseer_details to filter by lang
-        from sqlalchemy import join
+
         j = join(VerseText, TranslationTafseerDetail, VerseText.detail_id == TranslationTafseerDetail.id)
         query = select(VerseText).select_from(j).where(TranslationTafseerDetail.lang == lang).order_by(VerseText.surah_number, VerseText.verse_number, VerseText.detail_id)
         
