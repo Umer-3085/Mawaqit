@@ -1,5 +1,5 @@
 from sqlalchemy import Column, String, Text, Enum
-from sqlalchemy.dialects.mysql import BIGINT, TINYINT, CHAR
+from sqlalchemy.dialects.mysql import BIGINT, CHAR
 from mawaqit.database import Base
 
 class TranslationTafseerDetail(Base):

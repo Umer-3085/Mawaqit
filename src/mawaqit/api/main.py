@@ -6,6 +6,7 @@ from mawaqit.api.article_videos import article_video_router
 from mawaqit.api.surah import surah_router
 from mawaqit.api.verse import verse_router
 from mawaqit.api.detail import translation_tafseer_details_router
+from mawaqit.api.text import verse_texts_router
 
 api_router = APIRouter(prefix="/api")
 
@@ -22,3 +23,5 @@ api_router.include_router(surah_router)
 api_router.include_router(verse_router)
 
 api_router.include_router(translation_tafseer_details_router)
+
+api_router.include_router(verse_texts_router)
