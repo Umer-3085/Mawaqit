@@ -1,0 +1,1 @@
+from .router import router as verse_texts_router
