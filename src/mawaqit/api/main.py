@@ -5,7 +5,7 @@ from mawaqit.api.subcategory import subcategory_router
 from mawaqit.api.article_videos import article_video_router
 from mawaqit.api.surah import surah_router
 from mawaqit.api.verse import verse_router
-from mawaqit.api.translation_tafseer_details import translation_tafseer_details_router
+from mawaqit.api.detail import translation_tafseer_details_router
 
 api_router = APIRouter(prefix="/api")
 

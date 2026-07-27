@@ -1,10 +1,10 @@
 from fastapi import APIRouter, Depends, Query
-from mawaqit.schemas.translation_tafseer_details import (
+from mawaqit.schemas.detail import (
     TranslationTafseerDetailResponse,
     TranslationTafseerDetailSimple,
     TranslationTafseerDetailList
 )
-from mawaqit.services.translation_tafseer_details import TranslationTafseerDetailService
+from mawaqit.services.detail import TranslationTafseerDetailService
 from mawaqit.api.deps import get_translation_tafseer_details_service
 
 router = APIRouter(prefix="/translation-tafseer-details", tags=["Translation/Tafseer Details"])

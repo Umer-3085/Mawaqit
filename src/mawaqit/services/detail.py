@@ -1,6 +1,6 @@
 from fastapi import HTTPException
-from mawaqit.repositories.translation_tafseer_details import TranslationTafseerDetailRepository
-from mawaqit.models.translation_tafseer_details import TranslationTafseerDetail
+from mawaqit.repositories.detail import TranslationTafseerDetailRepository
+from mawaqit.models.detail import TranslationTafseerDetail
 
 class TranslationTafseerDetailService:
     def __init__(self, repo: TranslationTafseerDetailRepository):

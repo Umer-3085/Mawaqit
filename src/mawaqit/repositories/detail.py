@@ -1,6 +1,6 @@
 from sqlalchemy import select, func, or_
 from sqlalchemy.ext.asyncio import AsyncSession
-from mawaqit.models.translation_tafseer_details import TranslationTafseerDetail
+from mawaqit.models.detail import TranslationTafseerDetail
 
 class TranslationTafseerDetailRepository:
     def __init__(self, db: AsyncSession):
