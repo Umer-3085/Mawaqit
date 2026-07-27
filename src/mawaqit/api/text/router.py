@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, Query
-from mawaqit.schemas.verse_texts import VerseTextResponse, VerseTextList
-from mawaqit.services.verse_texts import VerseTextService
+from mawaqit.schemas.text import VerseTextResponse, VerseTextList
+from mawaqit.services.text import VerseTextService
 from mawaqit.api.deps import get_verse_texts_service
 
 router = APIRouter(prefix="/verse-texts", tags=["Verse Texts"])

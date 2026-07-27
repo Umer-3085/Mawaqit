@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, Path
 from mawaqit.schemas.detail import (
     TranslationTafseerDetailResponse,
     TranslationTafseerDetailSimple,
@@ -53,7 +53,7 @@ async def get_by_direction(
 
 @router.get("/by-author/{author}", response_model=list[TranslationTafseerDetailResponse])
 async def get_by_author(
-    author: str = Query(..., min_length=1, max_length=100),
+    author: str = Path(...),
     page: int = Query(1, ge=1),
     page_size: int = Query(100, ge=1, le=100),
     service: TranslationTafseerDetailService = Depends(get_translation_tafseer_details_service)

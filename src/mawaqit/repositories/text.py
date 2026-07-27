@@ -1,6 +1,6 @@
 from sqlalchemy import select, func, or_, join
 from sqlalchemy.ext.asyncio import AsyncSession
-from mawaqit.models.verse_texts import VerseText
+from mawaqit.models.text import VerseText
 from mawaqit.models.detail import TranslationTafseerDetail
 from typing import Optional
 

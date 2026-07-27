@@ -5,8 +5,7 @@ from .article_videos import ArticleVideo
 from .surah import Surah
 from .verse import Verse
 from .detail import TranslationTafseerDetail
-from .verse_texts import VerseText
-
+from .text import VerseText
 
 __all__ = [
     "Admin",

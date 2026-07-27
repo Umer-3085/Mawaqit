@@ -1,9 +1,9 @@
 from fastapi import HTTPException
-from mawaqit.repositories.verse_texts import VerseTextRepository
+from mawaqit.repositories.text import VerseTextRepository
 from mawaqit.repositories.surah import SurahRepository
 from mawaqit.repositories.verse import VerseRepository
 from mawaqit.repositories.detail import TranslationTafseerDetailRepository
-from mawaqit.models.verse_texts import VerseText
+from mawaqit.models.text import VerseText
 
 class VerseTextService:
     def __init__(
