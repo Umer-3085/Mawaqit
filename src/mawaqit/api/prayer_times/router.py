@@ -1,9 +1,11 @@
-from fastapi import APIRouter, Depends, Query
+from fastapi import APIRouter, Depends, Query, HTTPException
+from pydantic import ValidationError
 from datetime import date
 from mawaqit.schemas.prayer_times import (
     PrayerTimesResponse, PrayerTimesRangeResponse, SingleDayParams, DateRangeParams
 )
 from mawaqit.services.prayer_times import PrayerTimesService
+from mawaqit.schemas.prayer_times import PrayerAdjustments
 from mawaqit.api.deps import get_prayer_times_service
 
 router = APIRouter(prefix="/prayer-times", tags=["Prayer Times"])
@@ -25,12 +27,22 @@ async def get_prayer_times(
     isha_adj: int = Query(0, ge=-60, le=60),
     service: PrayerTimesService = Depends(get_prayer_times_service)
 ):
-    params = SingleDayParams(
-        lat=lat, lng=lng, prayer_date=date,  # <-- fix: prayer_date not date
-        calculation_method=calculation_method,
-        madhab=madhab, high_latitude_rule=high_latitude_rule, timezone=timezone,
-        adjustments=None  # <-- should build from individual adj params
-    )
+    try:
+        params = SingleDayParams(
+            lat=lat, lng=lng, prayer_date=date,  # <-- fix: prayer_date not date
+            calculation_method=calculation_method,
+            madhab=madhab, high_latitude_rule=high_latitude_rule, timezone=timezone,
+            adjustments=PrayerAdjustments(
+                fajr=fajr_adj,
+                sunrise=sunrise_adj,
+                dhuhr=dhuhr_adj,
+                asr=asr_adj,
+                maghrib=maghrib_adj,
+                isha=isha_adj,
+            ),
+        )
+    except ValidationError as e:
+        raise HTTPException(status_code=422, detail=e.errors())
     return service.get_by_date(params)
 
 @router.get("/today", response_model=PrayerTimesResponse)
@@ -57,14 +69,17 @@ async def get_prayer_times_range(
     timezone: str = Query(...),
     service: PrayerTimesService = Depends(get_prayer_times_service)
 ):
-    params = DateRangeParams(
-        lat=lat, lng=lng,
-        start_date=start_date,
-        end_date=end_date,
-        calculation_method=calculation_method,
-        madhab=madhab, high_latitude_rule=high_latitude_rule, timezone=timezone,
-        adjustments=None
-    )
+    try:
+        params = DateRangeParams(
+            lat=lat, lng=lng,
+            start_date=start_date,
+            end_date=end_date,
+            calculation_method=calculation_method,
+            madhab=madhab, high_latitude_rule=high_latitude_rule, timezone=timezone,
+            adjustments=None
+        )
+    except ValidationError as e:
+        raise HTTPException(status_code=422, detail=e.errors())
     return service.get_by_range(params)
 
 @router.get("/methods")
