@@ -32,6 +32,8 @@ from mawaqit.services.detail import TranslationTafseerDetailService
 from mawaqit.repositories.text import VerseTextRepository
 from mawaqit.services.text import VerseTextService
 
+from mawaqit.services.prayer_times import PrayerTimesService
+
 oauth2_scheme = HTTPBearer(auto_error=False)
 
 async def get_admin_service(db: AsyncSession = Depends(get_db)) -> AdminService:
@@ -89,3 +91,7 @@ async def get_verse_texts_service(db: AsyncSession = Depends(get_db)) -> VerseTe
         VerseRepository(db),
         TranslationTafseerDetailRepository(db)
     )
+
+
+async def get_prayer_times_service() -> PrayerTimesService:
+    return PrayerTimesService()
