@@ -26,9 +26,10 @@ async def get_prayer_times(
     service: PrayerTimesService = Depends(get_prayer_times_service)
 ):
     params = SingleDayParams(
-        lat=lat, lng=lng, date=date, calculation_method=calculation_method,
+        lat=lat, lng=lng, prayer_date=date,  # <-- fix: prayer_date not date
+        calculation_method=calculation_method,
         madhab=madhab, high_latitude_rule=high_latitude_rule, timezone=timezone,
-        adjustments=None  
+        adjustments=None  # <-- should build from individual adj params
     )
     return service.get_by_date(params)
 
