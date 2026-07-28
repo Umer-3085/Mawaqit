@@ -57,9 +57,12 @@ async def get_prayer_times_range(
     service: PrayerTimesService = Depends(get_prayer_times_service)
 ):
     params = DateRangeParams(
-        lat=lat, lng=lng, start_date=start_date, end_date=end_date,
-        calculation_method=calculation_method, madhab=madhab,
-        high_latitude_rule=high_latitude_rule, timezone=timezone
+        lat=lat, lng=lng,
+        start_date=start_date,
+        end_date=end_date,
+        calculation_method=calculation_method,
+        madhab=madhab, high_latitude_rule=high_latitude_rule, timezone=timezone,
+        adjustments=None
     )
     return service.get_by_range(params)
 

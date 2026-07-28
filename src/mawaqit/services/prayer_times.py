@@ -48,7 +48,7 @@ class PrayerTimesService:
             calc_params.adjustments = adjustments
 
         # Calculate
-        target_date = params.date or date.today()
+        target_date = params.prayer_date or date.today()
         dt = datetime(target_date.year, target_date.month, target_date.day, tzinfo=tz)
 
         pt = AdhanPrayerTimes(
@@ -80,7 +80,7 @@ class PrayerTimesService:
                   madhab: str = "SHAFI",
                   high_latitude_rule: str = "MIDDLE_OF_THE_NIGHT") -> PrayerTimesResponse:
         params = SingleDayParams(
-            lat=lat, lng=lng, date=date.today(), timezone=timezone,
+            lat=lat, lng=lng, prayer_date=date.today(), timezone=timezone,
             calculation_method=calculation_method, madhab=madhab,
             high_latitude_rule=high_latitude_rule
         )
@@ -94,7 +94,7 @@ class PrayerTimesService:
         current = params.start_date
         while current <= params.end_date:
             day_params = SingleDayParams(
-                lat=params.lat, lng=params.lng, date=current,
+                lat=params.lat, lng=params.lng, prayer_date=current,
                 calculation_method=params.calculation_method,
                 madhab=params.madhab, high_latitude_rule=params.high_latitude_rule,
                 timezone=params.timezone, adjustments=params.adjustments

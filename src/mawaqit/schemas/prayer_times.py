@@ -1,6 +1,7 @@
+from __future__ import annotations
 from datetime import date
 from typing import Optional
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field, field_validator
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
 
 CALCULATION_METHODS = [
@@ -43,15 +44,17 @@ class PrayerTimesRangeResponse(BaseModel):
 class SingleDayParams(BaseModel):
     lat: float = Field(..., ge=-90, le=90)
     lng: float = Field(..., ge=-180, le=180)
-    date: Optional[date] = None  # defaults to today
-    calculation_method: Optional[str] = Field("MUSLIM_WORLD_LEAGUE", pattern="^(" + "|".join(CALCULATION_METHODS) + ")$")
-    madhab: Optional[str] = Field("SHAFI", pattern="^(" + "|".join(MADHABS) + ")$")
-    high_latitude_rule: Optional[str] = Field("MIDDLE_OF_THE_NIGHT", pattern="^(" + "|".join(HIGH_LATITUDE_RULES) + ")$")
-    timezone: str = Field(..., min_length=1)  # IANA timezone, validated in service
+    # Renamed field to avoid collision with datetime.date
+    prayer_date: Optional[date] = Field(default=None, description="Date (YYYY-MM-DD), defaults to today")
+    calculation_method: str = Field("MUSLIM_WORLD_LEAGUE", pattern="^(" + "|".join(CALCULATION_METHODS) + ")$")
+    madhab: str = Field("SHAFI", pattern="^(" + "|".join(MADHABS) + ")$")
+    high_latitude_rule: str = Field("MIDDLE_OF_THE_NIGHT", pattern="^(" + "|".join(HIGH_LATITUDE_RULES) + ")$")
+    timezone: str = Field(..., min_length=1)
     adjustments: Optional[PrayerAdjustments] = None
 
-    @validator("timezone")
-    def validate_timezone(cls, v):
+    @field_validator("timezone")
+    @classmethod
+    def validate_timezone(cls, v: str) -> str:
         try:
             ZoneInfo(v)
         except ZoneInfoNotFoundError:
@@ -62,10 +65,11 @@ class DateRangeParams(SingleDayParams):
     start_date: date
     end_date: date
 
-    @validator("end_date")
-    def validate_range(cls, v, values):
-        if "start_date" in values and v < values["start_date"]:
+    @field_validator("end_date")
+    @classmethod
+    def validate_range(cls, v: date, info) -> date:
+        if "start_date" in info.data and v < info.data["start_date"]:
             raise ValueError("end_date must be >= start_date")
-        if "start_date" in values and (v - values["start_date"]).days > 30:
+        if "start_date" in info.data and (v - info.data["start_date"]).days > 30:
             raise ValueError("Date range cannot exceed 30 days")
         return v
