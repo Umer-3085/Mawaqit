@@ -47,7 +47,7 @@ class PrayerTimesService:
             calc_params.adjustments = adjustments
 
         # Calculate
-        target_date = params.prayer_date or date.today()
+        target_date = params.prayer_date or datetime.now(tz).date()
         dt = datetime(target_date.year, target_date.month, target_date.day, tzinfo=tz)
 
         pt = AdhanPrayerTimes(
