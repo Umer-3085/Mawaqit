@@ -7,7 +7,6 @@ from adhanpy.calculation.CalculationParameters import CalculationParameters
 from adhanpy.calculation.Madhab import Madhab
 from adhanpy.calculation.HighLatitudeRule import HighLatitudeRule
 from adhanpy.calculation.PrayerAdjustments import PrayerAdjustments as AdhanPrayerAdjustments
-from adhanpy.data.Coordinates import Coordinates
 from mawaqit.schemas.prayer_times import (
     PrayerTimesResponse, PrayerTimesRangeResponse, PrayerAdjustments, SingleDayParams, DateRangeParams
 )
@@ -90,6 +89,7 @@ class PrayerTimesService:
         return self._calculate_single(params)
 
     def get_by_range(self, params: DateRangeParams) -> PrayerTimesRangeResponse:
+        from datetime import timedelta
         items = []
         current = params.start_date
         while current <= params.end_date:
@@ -100,7 +100,6 @@ class PrayerTimesService:
                 timezone=params.timezone, adjustments=params.adjustments
             )
             items.append(self._calculate_single(day_params))
-            from datetime import timedelta
             current += timedelta(days=1)
         return PrayerTimesRangeResponse(
             items=items,
