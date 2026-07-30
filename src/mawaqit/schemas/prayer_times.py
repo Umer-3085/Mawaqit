@@ -16,6 +16,15 @@ HIGH_LATITUDE_RULES = [
     "MIDDLE_OF_THE_NIGHT", "SEVENTH_OF_THE_NIGHT", "TWILIGHT_ANGLE"
 ]
 
+NAFL_METHODS = [
+    "STANDARD_15MIN",
+    "QUARTER_DAY",
+    "SOLAR_ANGLE_SPEAR",
+    "SOLAR_ANGLE_DUHA",
+    "MALIKI_DELAYED",
+]
+
+
 class PrayerAdjustments(BaseModel):
     fajr: int = Field(0, ge=-60, le=60)
     sunrise: int = Field(0, ge=-60, le=60)
