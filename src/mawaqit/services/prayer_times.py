@@ -133,17 +133,34 @@ class PrayerTimesService:
             ishraq = sunrise + timedelta(minutes=15)
             duha_start = sunrise + day_len / 4
         elif method == "SOLAR_ANGLE_SPEAR":
-            ishraq = TimeComponents.from_float(solar.hour_angle(4.0, True)).date_components(date_comp)
-            duha_start = TimeComponents.from_float(solar.hour_angle(4.0, True)).date_components(date_comp)
+            ishraq_comp = TimeComponents.from_float(solar.hour_angle(4.0, True))
+            if ishraq_comp is None:
+                raise RuntimeError("Solar calculation failed for ishraq angle")
+            ishraq = ishraq_comp.date_components(date_comp)
+            
+            duha_comp = TimeComponents.from_float(solar.hour_angle(4.0, True))
+            if duha_comp is None:
+                raise RuntimeError("Solar calculation failed for duha angle")
+            duha_start = duha_comp.date_components(date_comp)
             ishraq_elev = 4.0
             duha_elev = 4.0
         elif method == "SOLAR_ANGLE_DUHA":
-            ishraq = TimeComponents.from_float(solar.hour_angle(4.0, True)).date_components(date_comp)
-            duha_start = TimeComponents.from_float(solar.hour_angle(15.0, True)).date_components(date_comp)
+            ishraq_comp = TimeComponents.from_float(solar.hour_angle(4.0, True))
+            if ishraq_comp is None:
+                raise RuntimeError("Solar calculation failed for ishraq angle")
+            ishraq = ishraq_comp.date_components(date_comp)
+            
+            duha_comp = TimeComponents.from_float(solar.hour_angle(15.0, True))
+            if duha_comp is None:
+                raise RuntimeError("Solar calculation failed for duha angle")
+            duha_start = duha_comp.date_components(date_comp)
             ishraq_elev = 4.0
             duha_elev = 15.0
         elif method == "MALIKI_DELAYED":
-            ishraq = TimeComponents.from_float(solar.hour_angle(7.0, True)).date_components(date_comp)
+            ishraq_comp = TimeComponents.from_float(solar.hour_angle(7.0, True))
+            if ishraq_comp is None:
+                raise RuntimeError("Solar calculation failed for ishraq angle")
+            ishraq = ishraq_comp.date_components(date_comp)
             duha_start = sunrise + day_len / 4
             ishraq_elev = 7.0
         

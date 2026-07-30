@@ -80,7 +80,7 @@ async def get_prayer_times_range(
             end_date=end_date,
             calculation_method=calculation_method,
             madhab=madhab, high_latitude_rule=high_latitude_rule, timezone=timezone,
-            adjustments=None,nafl_method=nafl_method
+            adjustments=None, nafl_method=nafl_method
         )
     except ValidationError as e:
         raise HTTPException(status_code=422, detail=e.errors())
