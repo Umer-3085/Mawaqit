@@ -16,6 +16,14 @@ HIGH_LATITUDE_RULES = [
     "MIDDLE_OF_THE_NIGHT", "SEVENTH_OF_THE_NIGHT", "TWILIGHT_ANGLE"
 ]
 
+NAFL_METHODS = [
+    "STANDARD_15MIN",
+    "QUARTER_DAY",
+    "SOLAR_ANGLE_SPEAR",
+    "SOLAR_ANGLE_DUHA",
+    "MALIKI_DELAYED",
+]
+
 class PrayerAdjustments(BaseModel):
     fajr: int = Field(0, ge=-60, le=60)
     sunrise: int = Field(0, ge=-60, le=60)
@@ -35,6 +43,14 @@ class PrayerTimesResponse(BaseModel):
     timezone: str
     calculation_method: str
     madhab: str
+    ishraq: Optional[str] = None
+    ishraq_elevation: Optional[float] = None
+    duha_start: Optional[str] = None
+    duha_start_elevation: Optional[float] = None
+    duha_end: Optional[str] = None
+    awwabin_start: Optional[str] = None
+    awwabin_end: Optional[str] = None
+    nafl_method: Optional[str] = None
 
 class PrayerTimesRangeResponse(BaseModel):
     items: list[PrayerTimesResponse]
@@ -51,6 +67,7 @@ class SingleDayParams(BaseModel):
     high_latitude_rule: str = Field("MIDDLE_OF_THE_NIGHT", pattern="^(" + "|".join(HIGH_LATITUDE_RULES) + ")$")
     timezone: str = Field(..., min_length=1)
     adjustments: Optional[PrayerAdjustments] = None
+    nafl_method: str = Field("QUARTER_DAY", pattern="^(" + "|".join(NAFL_METHODS) + ")$")
 
     @field_validator("timezone")
     @classmethod

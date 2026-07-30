@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Optional
 from zoneinfo import ZoneInfo
 from adhanpy.PrayerTimes import PrayerTimes as AdhanPrayerTimes
@@ -7,6 +7,7 @@ from adhanpy.calculation.CalculationParameters import CalculationParameters
 from adhanpy.calculation.Madhab import Madhab
 from adhanpy.calculation.HighLatitudeRule import HighLatitudeRule
 from adhanpy.calculation.PrayerAdjustments import PrayerAdjustments as AdhanPrayerAdjustments
+from adhanpy.util.TimeComponents import TimeComponents
 from mawaqit.schemas.prayer_times import (
     PrayerTimesResponse, PrayerTimesRangeResponse, PrayerAdjustments, SingleDayParams, DateRangeParams
 )
@@ -57,6 +58,9 @@ class PrayerTimesService:
             time_zone=tz
         )
 
+        # Calculate nafl times
+        nafl = self._calculate_nafl(pt, params.nafl_method)
+
         # Format response
         def fmt(dt_obj: datetime) -> str:
             return dt_obj.strftime("%H:%M")
@@ -71,17 +75,20 @@ class PrayerTimesService:
             isha=fmt(pt.isha),
             timezone=params.timezone,
             calculation_method=params.calculation_method,
-            madhab=params.madhab
+            madhab=params.madhab,
+            **nafl
         )
 
     def get_today(self, lat: float, lng: float, timezone: str,
                   calculation_method: str = "MUSLIM_WORLD_LEAGUE",
                   madhab: str = "SHAFI",
-                  high_latitude_rule: str = "MIDDLE_OF_THE_NIGHT") -> PrayerTimesResponse:
+                  high_latitude_rule: str = "MIDDLE_OF_THE_NIGHT",
+                  nafl_method: str = "QUARTER_DAY") -> PrayerTimesResponse:
         params = SingleDayParams(
             lat=lat, lng=lng, prayer_date=date.today(), timezone=timezone,
             calculation_method=calculation_method, madhab=madhab,
-            high_latitude_rule=high_latitude_rule
+            high_latitude_rule=high_latitude_rule,
+            nafl_method=nafl_method
         )
         return self._calculate_single(params)
 
@@ -97,7 +104,8 @@ class PrayerTimesService:
                 lat=params.lat, lng=params.lng, prayer_date=current,
                 calculation_method=params.calculation_method,
                 madhab=params.madhab, high_latitude_rule=params.high_latitude_rule,
-                timezone=params.timezone, adjustments=params.adjustments
+                timezone=params.timezone, adjustments=params.adjustments,
+                nafl_method=params.nafl_method
             )
             items.append(self._calculate_single(day_params))
             current += timedelta(days=1)
@@ -106,6 +114,69 @@ class PrayerTimesService:
             start_date=params.start_date.isoformat(),
             end_date=params.end_date.isoformat()
         )
+
+    def _calculate_nafl(self, pt: AdhanPrayerTimes, method: str) -> dict:
+        solar = pt._solar_time
+        sunrise = pt.sunrise
+        sunset_comp = TimeComponents.from_float(pt._solar_time.sunset)
+        sunset = sunset_comp.date_components(pt._date_components) if sunset_comp else None
+        date_comp = pt._date_components
+        
+        transit_comp = TimeComponents.from_float(solar.transit).date_components(date_comp)
+        day_len = sunset - sunrise
+        
+        ishraq = duha_start = ishraq_elev = duha_elev = None
+        
+        if method == "STANDARD_15MIN":
+            ishraq = sunrise + timedelta(minutes=15)
+            duha_start = sunrise + timedelta(minutes=15)
+        elif method == "QUARTER_DAY":
+            ishraq = sunrise + timedelta(minutes=15)
+            duha_start = sunrise + day_len / 4
+        elif method == "SOLAR_ANGLE_SPEAR":
+            ishraq_comp = TimeComponents.from_float(solar.hour_angle(4.0, True))
+            if ishraq_comp is None:
+                raise RuntimeError("Solar calculation failed for ishraq angle")
+            ishraq = ishraq_comp.date_components(date_comp)
+            
+            duha_comp = TimeComponents.from_float(solar.hour_angle(4.0, True))
+            if duha_comp is None:
+                raise RuntimeError("Solar calculation failed for duha angle")
+            duha_start = duha_comp.date_components(date_comp)
+            ishraq_elev = 4.0
+            duha_elev = 4.0
+        elif method == "SOLAR_ANGLE_DUHA":
+            ishraq_comp = TimeComponents.from_float(solar.hour_angle(4.0, True))
+            if ishraq_comp is None:
+                raise RuntimeError("Solar calculation failed for ishraq angle")
+            ishraq = ishraq_comp.date_components(date_comp)
+            
+            duha_comp = TimeComponents.from_float(solar.hour_angle(15.0, True))
+            if duha_comp is None:
+                raise RuntimeError("Solar calculation failed for duha angle")
+            duha_start = duha_comp.date_components(date_comp)
+            ishraq_elev = 4.0
+            duha_elev = 15.0
+        elif method == "MALIKI_DELAYED":
+            ishraq_comp = TimeComponents.from_float(solar.hour_angle(7.0, True))
+            if ishraq_comp is None:
+                raise RuntimeError("Solar calculation failed for ishraq angle")
+            ishraq = ishraq_comp.date_components(date_comp)
+            duha_start = sunrise + day_len / 4
+            ishraq_elev = 7.0
+        
+        def fmt(dt): return dt.strftime("%H:%M") if dt else None
+        
+        return {
+            "ishraq": fmt(ishraq),
+            "ishraq_elevation": ishraq_elev,
+            "duha_start": fmt(duha_start),
+            "duha_start_elevation": duha_elev,
+            "duha_end": fmt(transit_comp),
+            "awwabin_start": fmt(pt.maghrib),
+            "awwabin_end": fmt(pt.isha),
+            "nafl_method": method
+        }
 
     def get_methods(self) -> list[dict]:
         """Return available calculation methods with descriptions"""
