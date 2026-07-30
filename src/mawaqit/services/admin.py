@@ -6,6 +6,7 @@ from mawaqit.repositories.admin import AdminRepository
 
 pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
+
 class AdminService:
     def __init__(self, repo: AdminRepository):
         self.repo = repo

@@ -1,6 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import Optional, Literal
 
+
 class VerseResponse(BaseModel):
     surah_number: int
     number_in_surah: int
@@ -12,8 +13,10 @@ class VerseResponse(BaseModel):
     ruku: Optional[int] = None
     hizb_quarter: Optional[int] = None
     sajda: bool
+
     class Config:
         from_attributes = True
+
 
 class VerseList(BaseModel):
     items: list[VerseResponse]

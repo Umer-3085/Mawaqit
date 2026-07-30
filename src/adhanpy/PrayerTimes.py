@@ -44,9 +44,7 @@ class PrayerTimes:
         self.calculation_parameters = calculation_parameters
 
         if self.calculation_parameters is None:
-            self.calculation_parameters = CalculationParameters(
-                method=calculation_method
-            )
+            self.calculation_parameters = CalculationParameters(method=calculation_method)
 
         latitude, longitude = coordinates
         self.coordinates = Coordinates(latitude, longitude)
@@ -89,9 +87,7 @@ class PrayerTimes:
         )
 
         tomorrow_solar_time = SolarTime(tomorrow_date_components, self.coordinates)
-        tomorrow_sunrise_components = TimeComponents.from_float(
-            tomorrow_solar_time.sunrise
-        )
+        tomorrow_sunrise_components = TimeComponents.from_float(tomorrow_solar_time.sunrise)
 
         if (
             transit is None
@@ -102,12 +98,9 @@ class PrayerTimes:
             raise RuntimeError
 
         # get night length
-        tomorrow_sunrise = tomorrow_sunrise_components.date_components(
-            tomorrow_date_components
-        )
+        tomorrow_sunrise = tomorrow_sunrise_components.date_components(tomorrow_date_components)
         self.night_length = (
-            tomorrow_sunrise.timestamp() * 1000
-            - self._sunset_components.timestamp() * 1000
+            tomorrow_sunrise.timestamp() * 1000 - self._sunset_components.timestamp() * 1000
         )
         self.night_portions = self.calculation_parameters.night_portions()
 
@@ -128,10 +121,7 @@ class PrayerTimes:
         ):
             temp_fajr = time_components.date_components(self._date_components)
 
-        if (
-            self.calculation_parameters.method
-            == CalculationMethod.MOON_SIGHTING_COMMITTEE
-        ):
+        if self.calculation_parameters.method == CalculationMethod.MOON_SIGHTING_COMMITTEE:
             if self.coordinates.latitude >= 55:
                 temp_fajr = self._sunrise_components + timedelta(
                     seconds=-1 * int(self.night_length / 7000)
@@ -146,9 +136,7 @@ class PrayerTimes:
         else:
             portion = self.night_portions.fajr
             night_fraction = int(portion * self.night_length / 1000)
-            safe_fajr = self._sunrise_components + timedelta(
-                seconds=-1 * night_fraction
-            )
+            safe_fajr = self._sunrise_components + timedelta(seconds=-1 * night_fraction)
 
         if temp_fajr is None or temp_fajr < safe_fajr:
             temp_fajr = safe_fajr
@@ -178,9 +166,7 @@ class PrayerTimes:
 
     def _set_asr(self):
         if time_components := TimeComponents.from_float(
-            self._solar_time.afternoon(
-                self.calculation_parameters.madhab.get_shadow_length()
-            )
+            self._solar_time.afternoon(self.calculation_parameters.madhab.get_shadow_length())
         ):
             if temp_asr := time_components.date_components(self._date_components):
                 self.asr = self._rounded_minute(
@@ -209,31 +195,23 @@ class PrayerTimes:
             if self.calculation_parameters.isha_interval < 1:
                 raise ValueError("Isha interval is either not defined or less than 1.")
 
-            temp_isha = sunset + timedelta(
-                seconds=self.calculation_parameters.isha_interval * 60
-            )
+            temp_isha = sunset + timedelta(seconds=self.calculation_parameters.isha_interval * 60)
         except:
             timeComponents = TimeComponents.from_float(
-                self._solar_time.hour_angle(
-                    -self.calculation_parameters.isha_angle, True
-                )
+                self._solar_time.hour_angle(-self.calculation_parameters.isha_angle, True)
             )
 
             if timeComponents is not None:
                 temp_isha = timeComponents.date_components(self._date_components)
 
             if (
-                self.calculation_parameters.method
-                == CalculationMethod.MOON_SIGHTING_COMMITTEE
+                self.calculation_parameters.method == CalculationMethod.MOON_SIGHTING_COMMITTEE
                 and self.coordinates.latitude >= 55
             ):
                 night_fraction = int(self.night_length / 7000)
                 temp_isha = self._sunset_components + timedelta(seconds=night_fraction)
 
-            if (
-                self.calculation_parameters.method
-                == CalculationMethod.MOON_SIGHTING_COMMITTEE
-            ):
+            if self.calculation_parameters.method == CalculationMethod.MOON_SIGHTING_COMMITTEE:
                 safe_isha = season_adjusted_evening_twilight(
                     self.coordinates.latitude,
                     self._day_of_year,
@@ -244,9 +222,7 @@ class PrayerTimes:
                 portion = self.night_portions.isha
                 night_fraction = int(portion * self.night_length / 1000)
 
-                safe_isha = self._sunset_components + timedelta(
-                    seconds=int(night_fraction)
-                )
+                safe_isha = self._sunset_components + timedelta(seconds=int(night_fraction))
 
             if temp_isha is None or temp_isha > safe_isha:
                 temp_isha = safe_isha
@@ -258,9 +234,7 @@ class PrayerTimes:
             temp_isha,
         )
 
-    def _rounded_minute(
-        self, adjustments, method_adjustments, prayer_name, temp_prayer
-    ):
+    def _rounded_minute(self, adjustments, method_adjustments, prayer_name, temp_prayer):
         prayer_adjustments = getattr(adjustments, prayer_name)
         method_prayer_adjustments = getattr(method_adjustments, prayer_name)
         return rounded_minute(

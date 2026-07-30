@@ -3,12 +3,15 @@ from mawaqit.repositories.subcategory import SubCategoryRepository
 from mawaqit.models.subcategory import SubCategory
 from mawaqit.repositories.category import CategoryRepository
 
+
 class SubCategoryService:
     def __init__(self, repo: SubCategoryRepository, category_repo: CategoryRepository):
         self.repo = repo
         self.category_repo = category_repo
 
-    async def get_all(self, page: int, page_size: int, category_id: int | None = None) -> tuple[list[SubCategory], int]:
+    async def get_all(
+        self, page: int, page_size: int, category_id: int | None = None
+    ) -> tuple[list[SubCategory], int]:
         return await self.repo.get_all(page, page_size, category_id)
 
     async def get_by_id(self, subcategory_id: int) -> SubCategory:
@@ -28,7 +31,13 @@ class SubCategoryService:
             raise HTTPException(status_code=400, detail="Subcategory title already exists")
         return await self.repo.create(title, category_id, description)
 
-    async def update(self, subcategory_id: int, title: str | None, category_id: int | None, description: str | None) -> SubCategory:
+    async def update(
+        self,
+        subcategory_id: int,
+        title: str | None,
+        category_id: int | None,
+        description: str | None,
+    ) -> SubCategory:
         subcategory = await self.get_by_id(subcategory_id)
         if title is not None:
             existing = await self.repo.get_by_title(title)
@@ -45,7 +54,6 @@ class SubCategoryService:
         has_videos = await self.repo.has_article_videos(subcategory_id)
         if has_videos:
             raise HTTPException(
-                status_code=400,
-                detail="Delete all article/videos in this subcategory first"
+                status_code=400, detail="Delete all article/videos in this subcategory first"
             )
         await self.repo.delete(subcategory)

@@ -102,11 +102,7 @@ def apparent_obliquity_of_the_ecliptic(T: float, ε0: float) -> float:
 def altitude_of_celestial_body(φ: float, δ: float, H: float) -> float:
     # Equation from Astronomical Algorithms page 93
     term1 = math.sin(math.radians(φ)) * math.sin(math.radians(δ))
-    term2 = (
-        math.cos(math.radians(φ))
-        * math.cos(math.radians(δ))
-        * math.cos(math.radians(H))
-    )
+    term2 = math.cos(math.radians(φ)) * math.cos(math.radians(δ)) * math.cos(math.radians(H))
     return math.degrees(math.asin(term1 + term2))
 
 
@@ -116,9 +112,7 @@ def approximate_transit(L: float, Θ0: float, α2: float) -> float:
     return normalize_with_bound((α2 + Lw - Θ0) / 360, 1)
 
 
-def corrected_transit(
-    m0: float, L: float, Θ0: float, α2: float, α1: float, α3: float
-) -> float:
+def corrected_transit(m0: float, L: float, Θ0: float, α2: float, α1: float, α3: float) -> float:
     # Equation from page Astronomical Algorithms 102
     Lw = L * -1
     θ = unwind_angle(Θ0 + (360.985647 * m0))

@@ -36,12 +36,13 @@ from mawaqit.services.prayer_times import PrayerTimesService
 
 oauth2_scheme = HTTPBearer(auto_error=False)
 
+
 async def get_admin_service(db: AsyncSession = Depends(get_db)) -> AdminService:
     return AdminService(AdminRepository(db))
 
+
 async def get_current_admin(
-    credentials = Depends(oauth2_scheme),
-    service: AdminService = Depends(get_admin_service)
+    credentials=Depends(oauth2_scheme), service: AdminService = Depends(get_admin_service)
 ) -> Admin:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
@@ -62,34 +63,41 @@ async def get_current_admin(
         raise credentials_exception
     return admin
 
+
 async def get_category_service(db: AsyncSession = Depends(get_db)) -> CategoryService:
     return CategoryService(CategoryRepository(db))
+
 
 async def get_subcategory_service(db: AsyncSession = Depends(get_db)) -> SubCategoryService:
     return SubCategoryService(SubCategoryRepository(db), CategoryRepository(db))
 
+
 async def get_article_video_service(db: AsyncSession = Depends(get_db)) -> ArticleVideoService:
     return ArticleVideoService(
-        ArticleVideoRepository(db),
-        CategoryRepository(db),
-        SubCategoryRepository(db)
+        ArticleVideoRepository(db), CategoryRepository(db), SubCategoryRepository(db)
     )
+
 
 async def get_surah_service(db: AsyncSession = Depends(get_db)) -> SurahService:
     return SurahService(SurahRepository(db))
 
+
 async def get_verse_service(db: AsyncSession = Depends(get_db)) -> VerseService:
     return VerseService(VerseRepository(db), SurahRepository(db))
 
-async def get_translation_tafseer_details_service(db: AsyncSession = Depends(get_db)) -> TranslationTafseerDetailService:
+
+async def get_translation_tafseer_details_service(
+    db: AsyncSession = Depends(get_db),
+) -> TranslationTafseerDetailService:
     return TranslationTafseerDetailService(TranslationTafseerDetailRepository(db))
+
 
 async def get_verse_texts_service(db: AsyncSession = Depends(get_db)) -> VerseTextService:
     return VerseTextService(
         VerseTextRepository(db),
         SurahRepository(db),
         VerseRepository(db),
-        TranslationTafseerDetailRepository(db)
+        TranslationTafseerDetailRepository(db),
     )
 
 

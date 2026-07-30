@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from mawaqit.models.category import Category
 from mawaqit.models.article_videos import ArticleVideo  # need model
 
+
 class CategoryRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -31,7 +32,9 @@ class CategoryRepository:
         await self.db.refresh(category)
         return category
 
-    async def update(self, category: Category, title: str | None = None, description: str | None = None) -> Category:
+    async def update(
+        self, category: Category, title: str | None = None, description: str | None = None
+    ) -> Category:
         if title is not None:
             category.title = title
         if description is not None:

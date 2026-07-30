@@ -11,9 +11,7 @@ from adhanpy.astronomy.SolarCoordinates import SolarCoordinates
 
 class SolarTime:
     def __init__(self, date_components, coordinates):
-        julian_date = julian_day(
-            date_components.year, date_components.month, date_components.day
-        )
+        julian_date = julian_day(date_components.year, date_components.month, date_components.day)
 
         self.prev_solar = SolarCoordinates(julian_date - 1)
         self.solar = SolarCoordinates(julian_date)

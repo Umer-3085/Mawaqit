@@ -36,6 +36,4 @@ class SolarCoordinates:
         )
 
         # Equation from Astronomical Algorithms page 88
-        self.apparent_sidereal_time = θ0 + (
-            ((ΔΨ * 3600) * math.cos(math.radians(ε0 + Δε))) / 3600
-        )
+        self.apparent_sidereal_time = θ0 + (((ΔΨ * 3600) * math.cos(math.radians(ε0 + Δε))) / 3600)

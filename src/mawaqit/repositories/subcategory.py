@@ -3,6 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from mawaqit.models.subcategory import SubCategory
 from mawaqit.models.article_videos import ArticleVideo
 
+
 class SubCategoryRepository:
     def __init__(self, db: AsyncSession):
         self.db = db
@@ -14,7 +15,9 @@ class SubCategoryRepository:
         result = await self.db.execute(select(SubCategory).where(SubCategory.title == title))
         return result.scalar_one_or_none()
 
-    async def get_all(self, page: int = 1, page_size: int = 20, category_id: int | None = None) -> tuple[list[SubCategory], int]:
+    async def get_all(
+        self, page: int = 1, page_size: int = 20, category_id: int | None = None
+    ) -> tuple[list[SubCategory], int]:
         page_size = min(page_size, 100)
         offset = (page - 1) * page_size
         query = select(SubCategory).order_by(SubCategory.title)
@@ -35,7 +38,13 @@ class SubCategoryRepository:
         await self.db.refresh(subcategory)
         return subcategory
 
-    async def update(self, subcategory: SubCategory, title: str | None = None, category_id: int | None = None, description: str | None = None) -> SubCategory:
+    async def update(
+        self,
+        subcategory: SubCategory,
+        title: str | None = None,
+        category_id: int | None = None,
+        description: str | None = None,
+    ) -> SubCategory:
         if title is not None:
             subcategory.title = title
         if category_id is not None:

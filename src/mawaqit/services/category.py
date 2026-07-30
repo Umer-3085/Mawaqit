@@ -2,6 +2,7 @@ from fastapi import HTTPException, status
 from mawaqit.repositories.category import CategoryRepository
 from mawaqit.models.category import Category
 
+
 class CategoryService:
     def __init__(self, repo: CategoryRepository):
         self.repo = repo
@@ -21,7 +22,9 @@ class CategoryService:
             raise HTTPException(status_code=400, detail="Category title already exists")
         return await self.repo.create(title, description)
 
-    async def update(self, category_id: int, title: str | None, description: str | None) -> Category:
+    async def update(
+        self, category_id: int, title: str | None, description: str | None
+    ) -> Category:
         category = await self.get_by_id(category_id)
         if title is not None:
             existing = await self.repo.get_by_title(title)
@@ -34,7 +37,6 @@ class CategoryService:
         has_videos = await self.repo.has_article_videos(category_id)
         if has_videos:
             raise HTTPException(
-                status_code=400,
-                detail="Delete all article/videos in this category first"
+                status_code=400, detail="Delete all article/videos in this category first"
             )
         await self.repo.delete(category)

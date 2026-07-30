@@ -5,41 +5,47 @@ from mawaqit.repositories.verse import VerseRepository
 from mawaqit.repositories.detail import TranslationTafseerDetailRepository
 from mawaqit.models.text import VerseText
 
+
 class VerseTextService:
     def __init__(
-        self, 
+        self,
         repo: VerseTextRepository,
         surah_repo: SurahRepository,
         verse_repo: VerseRepository,
-        detail_repo: TranslationTafseerDetailRepository
+        detail_repo: TranslationTafseerDetailRepository,
     ):
         self.repo = repo
         self.surah_repo = surah_repo
         self.verse_repo = verse_repo
         self.detail_repo = detail_repo
 
-    async def get_by_composite_key(self, surah_number: int, verse_number: int, detail_id: int) -> VerseText:
+    async def get_by_composite_key(
+        self, surah_number: int, verse_number: int, detail_id: int
+    ) -> VerseText:
         if not 1 <= surah_number <= 114:
             raise HTTPException(status_code=400, detail="Surah number must be between 1 and 114")
         if verse_number < 1:
             raise HTTPException(status_code=400, detail="Verse number must be positive")
         if detail_id <= 0:
             raise HTTPException(status_code=400, detail="Detail ID must be positive")
-        
+
         # Validate surah exists
         surah = await self.surah_repo.get_by_number(surah_number)
         if not surah:
             raise HTTPException(status_code=404, detail="Surah not found")
-        
+
         # Validate verse exists
         if verse_number > surah.total_ayat:
-            raise HTTPException(status_code=400, detail=f"Verse number must be between 1 and {surah.total_ayat} for this surah")
-        
+            raise HTTPException(
+                status_code=400,
+                detail=f"Verse number must be between 1 and {surah.total_ayat} for this surah",
+            )
+
         # Validate detail exists
         detail = await self.detail_repo.get_by_id(detail_id)
         if not detail:
             raise HTTPException(status_code=404, detail="Translation/Tafseer detail not found")
-        
+
         verse_text = await self.repo.get_by_composite_key(surah_number, verse_number, detail_id)
         if not verse_text:
             raise HTTPException(status_code=404, detail="Verse text not found")
@@ -67,7 +73,10 @@ class VerseTextService:
         if not surah:
             raise HTTPException(status_code=404, detail="Surah not found")
         if not 1 <= verse_number <= surah.total_ayat:
-            raise HTTPException(status_code=400, detail=f"Verse number must be between 1 and {surah.total_ayat} for this surah")
+            raise HTTPException(
+                status_code=400,
+                detail=f"Verse number must be between 1 and {surah.total_ayat} for this surah",
+            )
         return await self.repo.get_by_verse(surah_number, verse_number)
 
     async def get_by_detail(self, detail_id: int, page: int, page_size: int):

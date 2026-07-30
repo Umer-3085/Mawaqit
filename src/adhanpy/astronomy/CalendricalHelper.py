@@ -1,9 +1,7 @@
 import math
 
 
-def julian_day(
-    year: int, month: int, day: int, hours: float = 0.0, minutes: float = 0.0
-):
+def julian_day(year: int, month: int, day: int, hours: float = 0.0, minutes: float = 0.0):
     if minutes != 0.0:
         hours = hours + (minutes / 60.0)
 

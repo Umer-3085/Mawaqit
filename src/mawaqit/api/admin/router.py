@@ -6,11 +6,12 @@ from mawaqit.models.admin import Admin
 
 router = APIRouter(prefix="/admin", tags=["admin"])
 
+
 @router.post("/login", response_model=Token)
 async def login(
     username: str = Form(...),
     password: str = Form(...),
-    service: AdminService = Depends(get_admin_service)
+    service: AdminService = Depends(get_admin_service),
 ):
     admin = await service.repo.get_by_username(username)
     if not admin or not service.verify_password(password, admin.password_hash):
@@ -21,11 +22,12 @@ async def login(
         )
     return {"access_token": service.create_token(admin.username), "token_type": "bearer"}
 
+
 @router.patch("/me")
 async def update_me(
     update: AdminUpdate,
     current: Admin = Depends(get_current_admin),
-    service: AdminService = Depends(get_admin_service)
+    service: AdminService = Depends(get_admin_service),
 ):
     if update.username:
         existing = await service.repo.get_by_username(update.username)

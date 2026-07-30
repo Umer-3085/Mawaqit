@@ -2,6 +2,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from mawaqit.models.admin import Admin
 
+
 class AdminRepository:
     def __init__(self, session: AsyncSession):
         self.session = session
