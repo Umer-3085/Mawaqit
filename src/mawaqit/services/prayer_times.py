@@ -104,7 +104,8 @@ class PrayerTimesService:
                 lat=params.lat, lng=params.lng, prayer_date=current,
                 calculation_method=params.calculation_method,
                 madhab=params.madhab, high_latitude_rule=params.high_latitude_rule,
-                timezone=params.timezone, adjustments=params.adjustments
+                timezone=params.timezone, adjustments=params.adjustments,
+                nafl_method=params.nafl_method
             )
             items.append(self._calculate_single(day_params))
             current += timedelta(days=1)
