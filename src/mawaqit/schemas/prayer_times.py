@@ -24,7 +24,6 @@ NAFL_METHODS = [
     "MALIKI_DELAYED",
 ]
 
-
 class PrayerAdjustments(BaseModel):
     fajr: int = Field(0, ge=-60, le=60)
     sunrise: int = Field(0, ge=-60, le=60)
@@ -44,6 +43,14 @@ class PrayerTimesResponse(BaseModel):
     timezone: str
     calculation_method: str
     madhab: str
+    ishraq: Optional[str] = None
+    ishraq_elevation: Optional[float] = None
+    duha_start: Optional[str] = None
+    duha_start_elevation: Optional[float] = None
+    duha_end: Optional[str] = None
+    awwabin_start: Optional[str] = None
+    awwabin_end: Optional[str] = None
+    nafl_method: Optional[str] = None
 
 class PrayerTimesRangeResponse(BaseModel):
     items: list[PrayerTimesResponse]
