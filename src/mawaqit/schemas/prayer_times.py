@@ -67,6 +67,7 @@ class SingleDayParams(BaseModel):
     high_latitude_rule: str = Field("MIDDLE_OF_THE_NIGHT", pattern="^(" + "|".join(HIGH_LATITUDE_RULES) + ")$")
     timezone: str = Field(..., min_length=1)
     adjustments: Optional[PrayerAdjustments] = None
+    nafl_method: str = Field("QUARTER_DAY", pattern="^(" + "|".join(NAFL_METHODS) + ")$")
 
     @field_validator("timezone")
     @classmethod
