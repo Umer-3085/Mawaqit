@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from pydantic import ValidationError
 from datetime import date
 from mawaqit.schemas.prayer_times import (
-    PrayerTimesResponse, PrayerTimesRangeResponse, SingleDayParams, DateRangeParams
+    NAFL_METHODS, PrayerTimesResponse, PrayerTimesRangeResponse, SingleDayParams, DateRangeParams
 )
 from mawaqit.services.prayer_times import PrayerTimesService
 from mawaqit.schemas.prayer_times import PrayerAdjustments
@@ -25,13 +25,15 @@ async def get_prayer_times(
     asr_adj: int = Query(0, ge=-60, le=60),
     maghrib_adj: int = Query(0, ge=-60, le=60),
     isha_adj: int = Query(0, ge=-60, le=60),
-    service: PrayerTimesService = Depends(get_prayer_times_service)
+    service: PrayerTimesService = Depends(get_prayer_times_service),
+    nafl_method: str = Query("QUATER_DAY", enum=NAFL_METHODS)
 ):
     try:
         params = SingleDayParams(
             lat=lat, lng=lng, prayer_date=date,  # <-- fix: prayer_date not date
             calculation_method=calculation_method,
             madhab=madhab, high_latitude_rule=high_latitude_rule, timezone=timezone,
+            nafl_method=nafl_method,
             adjustments=PrayerAdjustments(
                 fajr=fajr_adj,
                 sunrise=sunrise_adj,
@@ -53,7 +55,8 @@ async def get_today_prayer_times(
     calculation_method: str = Query("MUSLIM_WORLD_LEAGUE"),
     madhab: str = Query("SHAFI"),
     high_latitude_rule: str = Query("MIDDLE_OF_THE_NIGHT"),
-    service: PrayerTimesService = Depends(get_prayer_times_service)
+    service: PrayerTimesService = Depends(get_prayer_times_service),
+    nafl_method: str = Query("QUATER_DAY", enum=NAFL_METHODS)
 ):
     return service.get_today(lat, lng, timezone, calculation_method, madhab, high_latitude_rule)
 
@@ -67,7 +70,8 @@ async def get_prayer_times_range(
     madhab: str = Query("SHAFI"),
     high_latitude_rule: str = Query("MIDDLE_OF_THE_NIGHT"),
     timezone: str = Query(...),
-    service: PrayerTimesService = Depends(get_prayer_times_service)
+    service: PrayerTimesService = Depends(get_prayer_times_service),
+    nafl_method: str = Query("QUATER_DAY", enum=NAFL_METHODS)
 ):
     try:
         params = DateRangeParams(
@@ -76,7 +80,7 @@ async def get_prayer_times_range(
             end_date=end_date,
             calculation_method=calculation_method,
             madhab=madhab, high_latitude_rule=high_latitude_rule, timezone=timezone,
-            adjustments=None
+            adjustments=None,nafl_method=nafl_method
         )
     except ValidationError as e:
         raise HTTPException(status_code=422, detail=e.errors())
