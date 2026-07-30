@@ -1,4 +1,4 @@
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 from typing import Optional
 from zoneinfo import ZoneInfo
 from adhanpy.PrayerTimes import PrayerTimes as AdhanPrayerTimes
@@ -7,6 +7,7 @@ from adhanpy.calculation.CalculationParameters import CalculationParameters
 from adhanpy.calculation.Madhab import Madhab
 from adhanpy.calculation.HighLatitudeRule import HighLatitudeRule
 from adhanpy.calculation.PrayerAdjustments import PrayerAdjustments as AdhanPrayerAdjustments
+from adhanpy.util.TimeComponents import TimeComponents
 from mawaqit.schemas.prayer_times import (
     PrayerTimesResponse, PrayerTimesRangeResponse, PrayerAdjustments, SingleDayParams, DateRangeParams
 )
@@ -106,6 +107,51 @@ class PrayerTimesService:
             start_date=params.start_date.isoformat(),
             end_date=params.end_date.isoformat()
         )
+
+    def _calculate_nafl(self, pt: AdhanPrayerTimes, method: str) -> dict:
+        solar = pt._solar_time
+        sunrise = pt.sunrise
+        sunset = pt.sunset
+        date_comp = pt._date_components
+        
+        transit_comp = TimeComponents.from_float(solar.transit).date_components(date_comp)
+        day_len = sunset - sunrise
+        
+        ishraq = duha_start = ishraq_elev = duha_elev = None
+        
+        if method == "STANDARD_15MIN":
+            ishraq = sunrise + timedelta(minutes=15)
+            duha_start = sunrise + timedelta(minutes=15)
+        elif method == "QUARTER_DAY":
+            ishraq = sunrise + timedelta(minutes=15)
+            duha_start = sunrise + day_len / 4
+        elif method == "SOLAR_ANGLE_SPEAR":
+            ishraq = TimeComponents.from_float(solar.hour_angle(4.0, True)).date_components(date_comp)
+            duha_start = TimeComponents.from_float(solar.hour_angle(4.0, True)).date_components(date_comp)
+            ishraq_elev = 4.0
+            duha_elev = 4.0
+        elif method == "SOLAR_ANGLE_DUHA":
+            ishraq = TimeComponents.from_float(solar.hour_angle(4.0, True)).date_components(date_comp)
+            duha_start = TimeComponents.from_float(solar.hour_angle(15.0, True)).date_components(date_comp)
+            ishraq_elev = 4.0
+            duha_elev = 15.0
+        elif method == "MALIKI_DELAYED":
+            ishraq = TimeComponents.from_float(solar.hour_angle(7.0, True)).date_components(date_comp)
+            duha_start = sunrise + day_len / 4
+            ishraq_elev = 7.0
+        
+        def fmt(dt): return dt.strftime("%H:%M") if dt else None
+        
+        return {
+            "ishraq": fmt(ishraq),
+            "ishraq_elevation": ishraq_elev,
+            "duha_start": fmt(duha_start),
+            "duha_start_elevation": duha_elev,
+            "duha_end": fmt(transit_comp),
+            "awwabin_start": fmt(pt.maghrib),
+            "awwabin_end": fmt(pt.isha),
+            "nafl_method": method
+        }
 
     def get_methods(self) -> list[dict]:
         """Return available calculation methods with descriptions"""
