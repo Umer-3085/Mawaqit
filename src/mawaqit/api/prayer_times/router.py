@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, Query, HTTPException
 from pydantic import ValidationError
 from datetime import date
 from mawaqit.schemas.prayer_times import (
-    NAFL_METHODS,
     PrayerTimesResponse,
     PrayerTimesRangeResponse,
     SingleDayParams,
@@ -31,7 +30,7 @@ async def get_prayer_times(
     maghrib_adj: int = Query(0, ge=-60, le=60),
     isha_adj: int = Query(0, ge=-60, le=60),
     service: PrayerTimesService = Depends(get_prayer_times_service),
-    nafl_method: str = Query("QUARTER_DAY", enum=NAFL_METHODS),
+    nafl_method: str = Query("QUARTER_DAY"),
 ):
     try:
         params = SingleDayParams(
@@ -66,7 +65,7 @@ async def get_today_prayer_times(
     madhab: str = Query("SHAFI"),
     high_latitude_rule: str = Query("MIDDLE_OF_THE_NIGHT"),
     service: PrayerTimesService = Depends(get_prayer_times_service),
-    nafl_method: str = Query("QUARTER_DAY", enum=NAFL_METHODS),
+    nafl_method: str = Query("QUARTER_DAY"),
 ):
     return service.get_today(
         lat, lng, timezone, calculation_method, madhab, high_latitude_rule, nafl_method
@@ -84,7 +83,7 @@ async def get_prayer_times_range(
     high_latitude_rule: str = Query("MIDDLE_OF_THE_NIGHT"),
     timezone: str = Query(...),
     service: PrayerTimesService = Depends(get_prayer_times_service),
-    nafl_method: str = Query("QUARTER_DAY", enum=NAFL_METHODS),
+    nafl_method: str = Query("QUARTER_DAY"),
 ):
     try:
         params = DateRangeParams(

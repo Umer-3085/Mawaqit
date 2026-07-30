@@ -143,12 +143,17 @@ class PrayerTimesService:
     def _calculate_nafl(self, pt: AdhanPrayerTimes, method: str) -> dict:
         solar = pt._solar_time
         sunrise = pt.sunrise
-        sunset_comp = TimeComponents.from_float(pt._solar_time.sunset)
-        sunset = sunset_comp.date_components(pt._date_components) if sunset_comp else None
         date_comp = pt._date_components
 
-        transit_comp = TimeComponents.from_float(solar.transit).date_components(date_comp)
-        day_len = sunset - sunrise
+        target_tz = pt.time_zone or sunrise.tzinfo
+
+        sunset_comp = TimeComponents.from_float(solar.sunset)
+        sunset = sunset_comp.date_components(date_comp).astimezone(target_tz) if sunset_comp else None
+
+        transit_comp = TimeComponents.from_float(solar.transit)
+        transit = transit_comp.date_components(date_comp).astimezone(target_tz) if transit_comp else None
+
+        day_len = sunset - sunrise if sunset and sunrise else timedelta(0)
 
         ishraq = duha_start = ishraq_elev = duha_elev = None
 
@@ -159,34 +164,34 @@ class PrayerTimesService:
             ishraq = sunrise + timedelta(minutes=15)
             duha_start = sunrise + day_len / 4
         elif method == "SOLAR_ANGLE_SPEAR":
-            ishraq_comp = TimeComponents.from_float(solar.hour_angle(4.0, True))
+            ishraq_comp = TimeComponents.from_float(solar.hour_angle(4.0, False))
             if ishraq_comp is None:
                 raise RuntimeError("Solar calculation failed for ishraq angle")
-            ishraq = ishraq_comp.date_components(date_comp)
+            ishraq = ishraq_comp.date_components(date_comp).astimezone(target_tz)
 
-            duha_comp = TimeComponents.from_float(solar.hour_angle(4.0, True))
+            duha_comp = TimeComponents.from_float(solar.hour_angle(4.0, False))
             if duha_comp is None:
                 raise RuntimeError("Solar calculation failed for duha angle")
-            duha_start = duha_comp.date_components(date_comp)
+            duha_start = duha_comp.date_components(date_comp).astimezone(target_tz)
             ishraq_elev = 4.0
             duha_elev = 4.0
         elif method == "SOLAR_ANGLE_DUHA":
-            ishraq_comp = TimeComponents.from_float(solar.hour_angle(4.0, True))
+            ishraq_comp = TimeComponents.from_float(solar.hour_angle(4.0, False))
             if ishraq_comp is None:
                 raise RuntimeError("Solar calculation failed for ishraq angle")
-            ishraq = ishraq_comp.date_components(date_comp)
+            ishraq = ishraq_comp.date_components(date_comp).astimezone(target_tz)
 
-            duha_comp = TimeComponents.from_float(solar.hour_angle(15.0, True))
+            duha_comp = TimeComponents.from_float(solar.hour_angle(15.0, False))
             if duha_comp is None:
                 raise RuntimeError("Solar calculation failed for duha angle")
-            duha_start = duha_comp.date_components(date_comp)
+            duha_start = duha_comp.date_components(date_comp).astimezone(target_tz)
             ishraq_elev = 4.0
             duha_elev = 15.0
         elif method == "MALIKI_DELAYED":
-            ishraq_comp = TimeComponents.from_float(solar.hour_angle(7.0, True))
+            ishraq_comp = TimeComponents.from_float(solar.hour_angle(7.0, False))
             if ishraq_comp is None:
                 raise RuntimeError("Solar calculation failed for ishraq angle")
-            ishraq = ishraq_comp.date_components(date_comp)
+            ishraq = ishraq_comp.date_components(date_comp).astimezone(target_tz)
             duha_start = sunrise + day_len / 4
             ishraq_elev = 7.0
 
@@ -198,7 +203,7 @@ class PrayerTimesService:
             "ishraq_elevation": ishraq_elev,
             "duha_start": fmt(duha_start),
             "duha_start_elevation": duha_elev,
-            "duha_end": fmt(transit_comp),
+            "duha_end": fmt(transit),
             "awwabin_start": fmt(pt.maghrib),
             "awwabin_end": fmt(pt.isha),
             "nafl_method": method,
