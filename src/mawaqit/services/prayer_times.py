@@ -82,11 +82,13 @@ class PrayerTimesService:
     def get_today(self, lat: float, lng: float, timezone: str,
                   calculation_method: str = "MUSLIM_WORLD_LEAGUE",
                   madhab: str = "SHAFI",
-                  high_latitude_rule: str = "MIDDLE_OF_THE_NIGHT") -> PrayerTimesResponse:
+                  high_latitude_rule: str = "MIDDLE_OF_THE_NIGHT",
+                  nafl_method: str = "QUARTER_DAY") -> PrayerTimesResponse:
         params = SingleDayParams(
             lat=lat, lng=lng, prayer_date=date.today(), timezone=timezone,
             calculation_method=calculation_method, madhab=madhab,
-            high_latitude_rule=high_latitude_rule
+            high_latitude_rule=high_latitude_rule,
+            nafl_method=nafl_method
         )
         return self._calculate_single(params)
 

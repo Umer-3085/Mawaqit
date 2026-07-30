@@ -58,7 +58,7 @@ async def get_today_prayer_times(
     service: PrayerTimesService = Depends(get_prayer_times_service),
     nafl_method: str = Query("QUARTER_DAY", enum=NAFL_METHODS)
 ):
-    return service.get_today(lat, lng, timezone, calculation_method, madhab, high_latitude_rule)
+    return service.get_today(lat, lng, timezone, calculation_method, madhab, high_latitude_rule, nafl_method)
 
 @router.get("/range", response_model=PrayerTimesRangeResponse)
 async def get_prayer_times_range(
