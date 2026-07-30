@@ -118,7 +118,8 @@ class PrayerTimesService:
     def _calculate_nafl(self, pt: AdhanPrayerTimes, method: str) -> dict:
         solar = pt._solar_time
         sunrise = pt.sunrise
-        sunset = pt.sunset
+        sunset_comp = TimeComponents.from_float(pt._solar_time.sunset)
+        sunset = sunset_comp.date_components(pt._date_components) if sunset_comp else None
         date_comp = pt._date_components
         
         transit_comp = TimeComponents.from_float(solar.transit).date_components(date_comp)
