@@ -58,6 +58,9 @@ class PrayerTimesService:
             time_zone=tz
         )
 
+        # Calculate nafl times
+        nafl = self._calculate_nafl(pt, params.nafl_method)
+
         # Format response
         def fmt(dt_obj: datetime) -> str:
             return dt_obj.strftime("%H:%M")
@@ -72,7 +75,8 @@ class PrayerTimesService:
             isha=fmt(pt.isha),
             timezone=params.timezone,
             calculation_method=params.calculation_method,
-            madhab=params.madhab
+            madhab=params.madhab,
+            **nafl
         )
 
     def get_today(self, lat: float, lng: float, timezone: str,
